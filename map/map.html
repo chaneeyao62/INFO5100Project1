@@ -13,6 +13,7 @@
   <script>
   var worldMap;
   var priceIndex;
+  var mappedData;
 
   var parseRow = function(row) {
     row.Rank = Number(row.Rank);
@@ -39,6 +40,7 @@
   .await(function (error, rawMap, rawData) {
     worldMap = rawMap;
     priceIndex = rawData;
+    mappedData = d3.map(priceIndex, function(d) {return d.Country;});
     showMap();
   });
 
@@ -46,17 +48,21 @@
   var projection = d3.geoRobinson().scale(100);
   var pathGenerator = d3.geoPath().projection(projection);
 
-  var mappedData = d3.map(priceIndex, function(d) {return d.Rank;});
 
   function showMap(){
     // Show the basic map
+    var macExtent = d3.extent(priceIndex, function(d) {return d.MacBook});
+    var macColors = ['#e5f5f9','#99d8c9','#2ca25f'];
+    var macScale = d3.scaleLinear().domain(macExtent).range(macColors);
     projection.fitExtent([[0,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
     var paths = svg_map.selectAll("path.country").data(worldMap.features);
     paths.enter().append("path").attr("class", "country")
     .merge(paths)
     .attr("d", function (country){
-      return pathGenerator(country);
-    });
+      return pathGenerator(country);})
+    .attr("fill", function(country) {
+      var rowData = mappedData.get(country.name)
+    }macScale(country));
   }
   </script>
 </body>
