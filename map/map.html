@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<head>
+  <title>Map</title>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+  <style>
+  #LaptopMap {border: solid #ccc 1px;}
+  </style>
+</head>
+<body>
+  <svg id="LaptopMap" height="600" width="900">
+  </svg>
+  <script>
+  var worldMap;
+  var priceIndex;
+
+  var parseRow = function(row) {
+    row.Rank = Number(row.Rank);
+    row.iPhone = Number(row.iPhone);
+    row.Android = Number(row.Android);
+    row.MacBook = Number(row.MacBook);
+    row["Windows Powered"] = Number(row["Windows Powered"]);
+    row["PS4"] = Number(row["PS4"]);
+    row["Xbox one"] = Number(row["Xbox one"]);
+    row["iPad mini"] = Number(row["iPad mini"]);
+    row["Samsung tablet"] = Number(row["Samsung tablet"]);
+    row["40 inch smart TV"] = Number(row["40 inch smart TV"]);
+    row["Apple Watch"] = Number(row["Apple Watch"]);
+    row["Brand headphone"] = Number(row["Brand headphone"]);
+    row["hard drive 2TB"] = Number(row["hard drive 2TB"]);
+    row["Portable charger"] = Number(row["Portable charger"]);
+    row.Printer = Number(row.Printer);
+    return row;
+  }
+
+  d3.queue()
+  .defer(d3.json, "countries.geo.json")
+  .defer(d3.csv, "TechnologyIndex.csv", parseRow)
+  .await(function (error, rawMap, rawData) {
+    worldMap = rawMap;
+    priceIndex = rawData;
+    showMap();
+  });
+
+  var svg_map = d3.select("#LaptopMap");
+  var projection = d3.geoRobinson().scale(100);
+  var pathGenerator = d3.geoPath().projection(projection);
+
+  var mappedData = d3.map(priceIndex, function(d) {return d.Rank;});
+
+  function showMap(){
+    // Show the basic map
+    projection.fitExtent([[0,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
+    var paths = svg_map.selectAll("path.country").data(worldMap.features);
+    paths.enter().append("path").attr("class", "country")
+    .merge(paths)
+    .attr("d", function (country){
+      return pathGenerator(country);
+    });
+  }
+  </script>
+</body>
