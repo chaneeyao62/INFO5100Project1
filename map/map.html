@@ -8,7 +8,7 @@
   </style>
 </head>
 <body>
-  <svg id="LaptopMap" height="600" width="900">
+  <svg id="LaptopMap" height="600" width="1000">
   </svg>
   <script>
   var worldMap;
@@ -43,26 +43,55 @@
     mappedData = d3.map(priceIndex, function(d) {return d.Country;});
     showMap();
   });
-
   var svg_map = d3.select("#LaptopMap");
   var projection = d3.geoRobinson().scale(100);
   var pathGenerator = d3.geoPath().projection(projection);
 
 
   function showMap(){
-    // Show the basic map
-    var macExtent = d3.extent(priceIndex, function(d) {return d.MacBook});
-    var macColors = ['#e5f5f9','#99d8c9','#2ca25f'];
-    var macScale = d3.scaleLinear().domain(macExtent).range(macColors);
-    projection.fitExtent([[0,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
-    var paths = svg_map.selectAll("path.country").data(worldMap.features);
-    paths.enter().append("path").attr("class", "country")
-    .merge(paths)
+    // Show the map for MacBooks
+    var macExtent = d3.extent(priceIndex, function(d) {return d.MacBook;});
+    var mapColors = ['#e5f5f9','#99d8c9','#2ca25f'];
+    var macScale = d3.scaleLog().domain(macExtent).range(mapColors);
+    projection.fitExtent([[0,0], [svg_map.attr("width")/2, svg_map.attr("height")]], worldMap);
+    var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
+    paths1.enter().append("path").attr("class", "mac")
+    .merge(paths1)
     .attr("d", function (country){
+      var rowData = mappedData.get(country.properties.name);
       return pathGenerator(country);})
     .attr("fill", function(country) {
-      var rowData = mappedData.get(country.name)
-    }macScale(country));
+      var rowData = mappedData.get(country.properties.name);
+      if(rowData){
+        return macScale(rowData.MacBook);
+      }
+    });
+
+    // Show the map for Windows Books
+    var winExtent = d3.extent(priceIndex, function(d) {return d["Windows Powered"];});
+    var winScale = d3.scaleLinear().domain(winExtent).range(mapColors);
+    projection.fitExtent([[svg_map.attr("width")/2,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
+    var paths2 = svg_map.selectAll("path.win").data(worldMap.features);
+    paths2.enter().append("path").attr("class", "win")
+    .merge(paths2)
+    .attr("d", function (country){
+      var rowData = mappedData.get(country.properties.name);
+      return pathGenerator(country);})
+    .attr("fill", function(country) {
+      var rowData = mappedData.get(country.properties.name);
+      if(rowData){
+        return winScale(rowData["Windows Powered"]);
+      }
+    });
+
   }
+  // Some countries (USA, UK, Hong Kong, Uruaguay, Singapore)
+  // have different names in csv & geojson, match them
+  function cleanMapData(){
+    worldMap.features.forEach
+
+  }
+
+
   </script>
 </body>
