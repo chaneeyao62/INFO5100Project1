@@ -1,0 +1,324 @@
+<html>
+<head>
+<title>INFO 3300 - Data-driven Web Applications</title>
+<link href="https://fonts.googleapis.com/css?family=Alegreya|Alegreya+Sans" rel="stylesheet">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/default.min.css">
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://d3js.org/topojson.v2.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+<style>
+svg { border: solid #ccc 1px; }
+</style>
+</head>
+
+<body>
+
+<script type="text/javascript">
+	var svg = d3.select("body")
+		.append("svg")
+        .attr("width", 1000)
+        .attr("height", 1000);
+
+    d3.select("svg")
+      .append("svg:image")
+      .attr("xlink:href", "ios.png")            
+      .attr("x", "100")
+      .attr("y", "50")
+      .attr("width", 300);
+
+	d3.select("svg")
+      .append("svg:image")
+      .attr("xlink:href", "android.png")            
+      .attr("x", "600")
+      .attr("y", "50")
+      .attr("width", 292);
+
+    var parseRow = function(row) {
+    row.Rank = Number(row.Rank);
+    row.iPhone = Number(row.iPhone);
+    row.Android = Number(row.Android);
+    row.MacBook = Number(row.MacBook);
+    row["Windows Powered"] = Number(row["Windows Powered"]);
+    row["PS4"] = Number(row["PS4"]);
+    row["Xbox one"] = Number(row["Xbox one"]);
+    row["iPad mini"] = Number(row["iPad mini"]);
+    row["Samsung tablet"] = Number(row["Samsung tablet"]);
+    row["40 inch smart TV"] = Number(row["40 inch smart TV"]);
+    row["Apple Watch"] = Number(row["Apple Watch"]);
+    row["Brand headphone"] = Number(row["Brand headphone"]);
+    row["hard drive 2TB"] = Number(row["hard drive 2TB"]);
+    row["Portable charger"] = Number(row["Portable charger"]);
+    row.Printer = Number(row.Printer);
+    return row;
+  	}
+
+    d3.queue()
+    .defer(d3.csv, "TechnologyIndex.csv", parseRow)
+    .await(function(error, data){
+   	
+   	// find the min and max of ios
+	var data = data.sort(function(x, y){
+    return d3.ascending(x.iPhone, y.iPhone);})
+
+    var iosMinData = [];
+    var iosMaxData = [];
+	
+    	// find the minum 7 numbers
+    	for (var i = 0; i < 7; i++){
+    		iosMinData.push(data[i]);
+    	}
+    	// find the max 7 numbers
+    	for (var i = 0; i < 7; i++){
+    		iosMaxData.push(data[data.length-i-1])
+    	}
+    	console.log(iosMinData);
+
+    // find the min and max of android
+    var Androiddata = data.sort(function(x, y){
+    return d3.ascending(x.Android, y.Android);})
+
+    var androidMinData = [];
+    var androidMaxData = [];
+	
+    	// find the minum 7 numbers
+    	for (var i = 0; i < 7; i++){
+    		androidMinData.push(Androiddata[i]);
+    	}
+    	// find the max 7 numbers
+    	for (var i = 0; i < 7; i++){
+    		androidMaxData.push(Androiddata[data.length-i-1])
+    	}
+    	console.log(androidMinData);
+    	console.log(androidMaxData);
+		
+		// draw the most expensive ios price country
+		svg.append("rect")
+    	   .attr("height", 90)
+    	   .attr("width", 90)
+    	   .attr("rx",10)
+    	   .attr("ry",10)
+    	   .attr("x",140)
+    	   .attr("y",150)
+    	   .attr("fill", "#E76818");  
+    	svg.append("text")
+           .attr("x", 185)             
+           .attr("y", 255)
+           .attr("text-anchor", "middle")  
+           .style("font-size", "10px")
+           .style("font-family", "Avenir")
+           .text("Venezuela");
+
+        svg.append("rect")
+    	   .attr("height", 23)
+    	   .attr("width", 47)
+    	   .attr("rx",8)
+    	   .attr("ry",8)
+    	   .attr("x",200)
+    	   .attr("y",140)
+    	   .attr("fill", "#D7191C");
+    	svg.append("text")
+           .attr("x", 223)             
+           .attr("y", 155)
+           .attr("text-anchor", "middle")  
+           .style("font-size", "12px")
+           .style("font-family", "Avenir")
+           .style("fill","white")
+           .text("$97814");
+
+
+        // draw the most expensive android price country
+        svg.append("rect")
+    	   .attr("height", 90)
+    	   .attr("width", 90)
+    	   .attr("rx",10)
+    	   .attr("ry",10)
+    	   .attr("x",640)
+    	   .attr("y",140)
+    	   .attr("fill", "#E76818");  
+    	svg.append("text")
+           .attr("x", 685)             
+           .attr("y", 245)
+           .attr("text-anchor", "middle")  
+           .style("font-size", "10px")
+           .style("font-family", "Avenir")
+           .text("Venezuela");
+
+		svg.append("rect")
+    	   .attr("height", 23)
+    	   .attr("width", 45)
+    	   .attr("rx",8)
+    	   .attr("ry",8)
+    	   .attr("x",700)
+    	   .attr("y",130)
+    	   .attr("fill", "#D7191C");
+    	svg.append("text")
+           .attr("x", 723)             
+           .attr("y", 145)
+           .attr("text-anchor", "middle")  
+           .style("font-size", "12px")
+           .style("font-family", "Avenir")
+           .style("fill","white")
+           .text("$78054");
+
+        var MaxData = Math.max(iosMaxData[1].iPhone, androidMaxData[1].Android)
+        var MinWarmColor = Math.min(iosMaxData[6].iPhone, androidMaxData[6].Android)
+        var MinColdColor = Math.min(iosMinData[0].iPhone, androidMinData[0].Android)
+        var MaxColdColor = Math.max(iosMinData[6].iPhone, androidMinData[6].Android)
+    	 	 
+    	var HeightScale = d3.scaleLinear().domain([200, MaxData]).range([10, 60])
+    	var WarmColor = ["#FBE771", "#F8A034"]
+    	var WarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
+    	var ColdColor = ["#2c7bb6", "#90eb9d"]
+    	var ColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
+
+    	var androidHeightScale = d3.scaleLinear().domain([200, MaxData]).range([10,60])
+    	var androidWarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
+    	var androidColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
+
+    	//the max values of ios
+
+    	for(var i = 1; i < 7; i++){
+    		var maxheight = HeightScale(iosMaxData[i].iPhone)
+    		var xAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3)
+    		var yAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -maxheight
+    		var maxCountryName = iosMaxData[i].Country
+    		var NamexAxis = xAxis + 30
+    		var NameyAxis = yAxis + 15 + maxheight
+    		var fillWarmData = WarmColorScale(iosMaxData[i].iPhone)
+
+		svg.append("rect")
+    	   .attr("height",maxheight)
+    	   .attr("width",60)
+    	   .attr("rx",7)
+    	   .attr("ry",7)
+    	   .attr("x",xAxis)
+    	   .attr("y",yAxis)
+    	   .attr("fill",fillWarmData)
+
+    	svg.append("text")
+        	.attr("x", NamexAxis)             
+        	.attr("y", NameyAxis)
+        	.attr("text-anchor", "middle")  
+        	.style("font-size", "10px")
+        	.style("font-family", "Avenir")
+        	.text(maxCountryName);
+    	}
+
+    	//the max values of android
+
+    	for(var i = 1; i < 7; i++){
+    		var androidmaxheight = androidHeightScale(androidMaxData[i].Android)
+    		var androidxAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3) + 500
+    		var androidyAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -androidmaxheight
+    		var androidmaxCountryName = androidMaxData[i].Country
+    		var androidNamexAxis = androidxAxis + 30
+    		var androidNameyAxis = androidyAxis + 15 + androidmaxheight
+    		var androidfillWarmData = androidWarmColorScale(androidMaxData[i].Android)
+
+		svg.append("rect")
+    	   .attr("height",androidmaxheight)
+    	   .attr("width",60)
+    	   .attr("rx",7)
+    	   .attr("ry",7)
+    	   .attr("x",androidxAxis)
+    	   .attr("y",androidyAxis)
+    	   .attr("fill",androidfillWarmData)
+
+    	svg.append("text")
+        	.attr("x", androidNamexAxis)             
+        	.attr("y", androidNameyAxis)
+        	.attr("text-anchor", "middle")  
+        	.style("font-size", "10px")
+        	.style("font-family", "Avenir")
+        	.text(androidmaxCountryName);
+    	}
+
+     	//the min values of ios
+    	for(var i = 0; i < 7; i++){
+    		var minHeight = HeightScale(iosMinData[i].iPhone)
+    		var minxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3))
+    		var minyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - minHeight
+    		var minCountryName = iosMinData[i].Country
+    		var minNamexAxis = minxAxis + 30
+    		var minNameyAxis = minyAxis + minHeight + 13
+    		var fillColdColor = ColdColorScale(iosMinData[i].iPhone)
+
+
+    		if (minCountryName=="United Arab Emirates") {minCountryName = "Emirates"}
+
+		svg.append("rect")
+    	   .attr("height",minHeight)
+    	   .attr("width",60)
+    	   .attr("rx",7)
+    	   .attr("ry",7)
+    	   .attr("x",minxAxis)
+    	   .attr("y",minyAxis)
+    	   .attr("fill",fillColdColor)
+
+    	svg.append("text")
+        	.attr("x", minNamexAxis)             
+        	.attr("y", minNameyAxis)
+        	.attr("text-anchor", "middle")  
+        	.style("font-size", "10px")
+        	.style("font-family", "Avenir")
+        	.text(minCountryName);
+    	}
+
+    	//the min values of android
+    	for(var i = 0; i < 7; i++){
+    		var androidminHeight = androidHeightScale(androidMinData[i].Android)
+    		var androidminxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3)) + 500
+    		var androidminyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - androidminHeight
+    		var androidminCountryName = androidMinData[i].Country
+    		var androidminNamexAxis = androidminxAxis + 30
+    		var androidminNameyAxis = androidminyAxis + androidminHeight + 13
+    		var androidfillColdColor = androidColdColorScale(androidMinData[i].Android)
+
+
+    		if (androidminCountryName=="United Arab Emirates") {androidminCountryName = "Emirates"}
+
+		svg.append("rect")
+    	   .attr("height",androidminHeight)
+    	   .attr("width",60)
+    	   .attr("rx",7)
+    	   .attr("ry",7)
+    	   .attr("x",androidminxAxis)
+    	   .attr("y",androidminyAxis)
+    	   .attr("fill",androidfillColdColor)
+
+    	svg.append("text")
+        	.attr("x", androidminNamexAxis)             
+        	.attr("y", androidminNameyAxis)
+        	.attr("text-anchor", "middle")  
+        	.style("font-size", "10px")
+        	.style("font-family", "Avenir")
+        	.text(androidminCountryName);
+    	}
+    	// add the icons of ios and android
+    	
+    	d3.select("svg")
+     	   .append("svg:image")
+      	   .attr("xlink:href", "apple.png")            
+     	   .attr("x", "200")
+     	   .attr("y", "650")
+     	   .attr("width", 70);
+
+		d3.select("svg")
+     	  .append("svg:image")
+    	  .attr("xlink:href", "androidIcon.png")            
+    	  .attr("x", "720")
+   	      .attr("y", "650")
+    	  .attr("width", 70);
+    });
+
+
+
+
+
+</script>
+
+
+
+
+</body>
+</html>
