@@ -4,7 +4,11 @@
   <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
   <style>
-  #LaptopMap {border: solid #ccc 1px;}
+  #LaptopMap {background-color: white;border: solid #ccc 1px;}
+  path.mac, path.win {stroke-width: 0.5px;}
+  #legend {stroke: #ccc; stroke-width: 1px;}
+  .border {stroke: #ccc; stroke-width: 1px; fill: white;}
+  #mapTitle {text-anchor: middle;}
   </style>
 </head>
 <body>
@@ -15,7 +19,6 @@
   var worldMap;
   var priceIndex;
   var priceIndex2; //price without Venezula
-  //var VenezuelaPrice;
   var mappedData;
 
   var parseRow = function(row) {
@@ -43,7 +46,6 @@
   .await(function (error, rawMap, rawData) {
     worldMap = rawMap;
     priceIndex = rawData;
-    VenezuelaPrice = priceIndex[71];
     priceIndex2 = priceIndex.slice(0, 71);
     mappedData = d3.map(priceIndex2, function(d) {return d.Country;});
     cleanMapData();
@@ -55,11 +57,32 @@
 
 
   function showMap(){
+
+    // Create Borders
+    svg_map.append("rect")
+    .attr("class", "border")
+    .attr("x", "0")
+    .attr("y", "0")
+    .attr("width", svg_map.attr("width")*0.5)
+    .attr("height", svg_map.attr("height")*0.7);
+
+    svg_map.append("rect")
+    .attr("class", "border")
+    .attr("x", "51%")
+    .attr("y", "0")
+    .attr("width", svg_map.attr("width")*0.49)
+    .attr("height", svg_map.attr("height")*0.7);
+
     // Show the map for MacBooks
     var macExtent = d3.extent(priceIndex2, function(d) {return d.MacBook;});
-    var mapColors = ['#e5f5f9','#99d8c9','#2ca25f'];
-    var macScale = d3.scaleLinear().domain(macExtent).range(mapColors);
-    projection.fitExtent([[0,0], [svg_map.attr("width")/2, svg_map.attr("height")]], worldMap);
+    var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
+    var minPrice = Math.min(macExtent[0], winExtent[0]);
+    var maxPrice = Math.max(macExtent[1], winExtent[1]);
+    var mapColors = ["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818"];
+    var macScale = d3.scaleQuantile().domain([Math.log(minPrice), Math.log(maxPrice)]).range(mapColors);
+    var venezuelaColor = '#d7191c';
+    var noDataColor = "#e8e8e8";
+    projection.fitExtent([[-50,-100], [svg_map.attr("width")/2, svg_map.attr("height")-50]], worldMap);
     var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
     paths1.enter().append("path").attr("class", "mac")
     .merge(paths1)
@@ -68,18 +91,26 @@
     .attr("fill", function(country) {
       var rowData = mappedData.get(country.properties.name);
       if(rowData){
-        return macScale(rowData.MacBook);
+        return macScale(Math.log(rowData.MacBook));
       }
-    });
-
-    // svg_map.append("path")
-    // .attr("d",)
-    // .attr("fill", "#ccc");
+      if(country.id == "VEN"){
+        return venezuelaColor
+      }
+      else{
+        return noDataColor;
+      }})
+      .attr("stroke", function(country){
+        var rowData = mappedData.get(country.properties.name);
+        if(rowData){
+          return "#ccc";}
+        else{
+          return "none";
+        };
+      });
 
     // Show the map for Windows Books
-    var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
-    var winScale = d3.scaleLinear().domain(winExtent).range(mapColors);
-    projection.fitExtent([[svg_map.attr("width")/2,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
+
+    projection.fitExtent([[svg_map.attr("width")/2-50,-100], [svg_map.attr("width"), svg_map.attr("height")-50]], worldMap);
     var paths2 = svg_map.selectAll("path.win").data(worldMap.features);
     paths2.enter().append("path").attr("class", "win")
     .merge(paths2)
@@ -88,9 +119,74 @@
     .attr("fill", function(country) {
       var rowData = mappedData.get(country.properties.name);
       if(rowData){
-        return winScale(rowData["Windows Powered"]);
+        return macScale(Math.log(rowData["Windows Powered"]));
       }
+      else if(country.id == "VEN"){
+        return venezuelaColor;
+      }
+      else{
+        return noDataColor;
+      }})
+      .attr("stroke", function(country){
+        var rowData = mappedData.get(country.properties.name);
+        if(rowData){
+          return "#ccc";}
+        else{
+          return "none";
+        }
     });
+
+    // Create legend for the data
+    var legendDefs = svg_map.append('defs');
+    var linearGradient = legendDefs.append("linearGradient")
+    .attr("id", "linearGradient");
+
+    linearGradient.selectAll("stop")
+    .data([
+        {offset: "0%", color: "#2c7bb6"},
+        {offset: "12.5%", color: "#00a6ca"},
+        {offset: "25%", color: "#00ccbc"},
+        {offset: "37.5%", color: "#90eb9d"},
+        {offset: "50%", color: "#ffff8c"},
+        {offset: "62.5%", color: "#f9d057"},
+        {offset: "75%", color: "#f29e2e"},
+        {offset: "87.5%", color: "#e76818"},
+        {offset: "100%", color: "#d7191c"}
+      ])
+    .enter().append("stop")
+    .attr("offset", function(d) { return d.offset; })
+    .attr("stop-color", function(d) { return d.color; });
+
+    var legend = svg_map.select("#legend");
+    svg_map.append("rect")
+    .attr("id", "legend")
+    .attr("x", "30%")
+    .attr("y", "80%")
+    .attr("width", svg_map.attr("width")*0.4)
+    .attr("height", 20)
+    .style("fill", "url(#linearGradient)");
+
+
+    // Append Logos
+    svg_map.append("svg:image")
+    .attr("xlink:href", "Apple_logo.png")
+    .attr("x", "23%")
+    .attr("y", "5%")
+    .attr("width", 30);
+
+    svg_map.append("svg:image")
+    .attr("xlink:href", "Windows_logo.png")
+    .attr("x", "73%")
+    .attr("y", "6%")
+    .attr("width", 30);
+
+    // Append title
+    svg_map.append("text")
+    .attr("id", "mapTitle")
+    .attr("x", "50%")
+    .attr("y", "90%")
+    .text("Worldwide Laptop Price");
+
 
   }
   // Some countries (USA, UK, Hong Kong, Uruaguay, Singapore)
