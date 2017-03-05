@@ -15,6 +15,7 @@
   var worldMap;
   var priceIndex;
   var priceIndex2; //price without Venezula
+  //var VenezuelaPrice;
   var mappedData;
 
   var parseRow = function(row) {
@@ -42,13 +43,14 @@
   .await(function (error, rawMap, rawData) {
     worldMap = rawMap;
     priceIndex = rawData;
+    VenezuelaPrice = priceIndex[71];
     priceIndex2 = priceIndex.slice(0, 71);
     mappedData = d3.map(priceIndex2, function(d) {return d.Country;});
     cleanMapData();
     showMap();
   });
   var svg_map = d3.select("#LaptopMap");
-  var projection = d3.geoRobinson().scale(100);
+  var projection = d3.geoRobinson();
   var pathGenerator = d3.geoPath().projection(projection);
 
 
@@ -61,7 +63,7 @@
     var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
     paths1.enter().append("path").attr("class", "mac")
     .merge(paths1)
-    .attr("d", function (country){
+    .attr("d", function(country){
       return pathGenerator(country);})
     .attr("fill", function(country) {
       var rowData = mappedData.get(country.properties.name);
@@ -69,6 +71,10 @@
         return macScale(rowData.MacBook);
       }
     });
+
+    // svg_map.append("path")
+    // .attr("d",)
+    // .attr("fill", "#ccc");
 
     // Show the map for Windows Books
     var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
