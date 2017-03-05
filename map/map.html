@@ -14,6 +14,7 @@
   <script>
   var worldMap;
   var priceIndex;
+  var priceIndex2; //price without Venezula
   var mappedData;
 
   var parseRow = function(row) {
@@ -41,7 +42,9 @@
   .await(function (error, rawMap, rawData) {
     worldMap = rawMap;
     priceIndex = rawData;
-    mappedData = d3.map(priceIndex, function(d) {return d.Country;});
+    priceIndex2 = priceIndex.slice(0, 71);
+    mappedData = d3.map(priceIndex2, function(d) {return d.Country;});
+    cleanMapData();
     showMap();
   });
   var svg_map = d3.select("#LaptopMap");
@@ -51,15 +54,14 @@
 
   function showMap(){
     // Show the map for MacBooks
-    var macExtent = d3.extent(priceIndex, function(d) {return d.MacBook;});
+    var macExtent = d3.extent(priceIndex2, function(d) {return d.MacBook;});
     var mapColors = ['#e5f5f9','#99d8c9','#2ca25f'];
-    var macScale = d3.scaleLog().domain(macExtent).range(mapColors);
+    var macScale = d3.scaleLinear().domain(macExtent).range(mapColors);
     projection.fitExtent([[0,0], [svg_map.attr("width")/2, svg_map.attr("height")]], worldMap);
     var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
     paths1.enter().append("path").attr("class", "mac")
     .merge(paths1)
     .attr("d", function (country){
-      var rowData = mappedData.get(country.properties.name);
       return pathGenerator(country);})
     .attr("fill", function(country) {
       var rowData = mappedData.get(country.properties.name);
@@ -69,14 +71,13 @@
     });
 
     // Show the map for Windows Books
-    var winExtent = d3.extent(priceIndex, function(d) {return d["Windows Powered"];});
+    var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
     var winScale = d3.scaleLinear().domain(winExtent).range(mapColors);
     projection.fitExtent([[svg_map.attr("width")/2,0], [svg_map.attr("width"), svg_map.attr("height")]], worldMap);
     var paths2 = svg_map.selectAll("path.win").data(worldMap.features);
     paths2.enter().append("path").attr("class", "win")
     .merge(paths2)
     .attr("d", function (country){
-      var rowData = mappedData.get(country.properties.name);
       return pathGenerator(country);})
     .attr("fill", function(country) {
       var rowData = mappedData.get(country.properties.name);
@@ -89,9 +90,20 @@
   // Some countries (USA, UK, Hong Kong, Uruaguay, Singapore)
   // have different names in csv & geojson, match them
   function cleanMapData(){
-    worldMap.features.forEach
+    worldMap.features.forEach(function(d){
+      if(d.id == "GBR"){
+        d.properties.name = "UK";
+      }
+      if(d.id == "USA"){
+        d.properties.name = "USA";
+      }
+      if(d.id == "URY"){
+        d.properties.name = "Uruaguay";
+      }
+    });
 
   }
+
 
 
   </script>
