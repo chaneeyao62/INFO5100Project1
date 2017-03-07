@@ -2,24 +2,34 @@
 <html>
 <head>
 	<title>INFO 3300 - Data-driven Web Applications</title>
-	<link href="https://fonts.googleapis.com/css?family=Alegreya|Alegreya+Sans" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 	<style>
-	svg { border: solid white 1px; }
+	body {font-family: 'Roboto Slab';}
+	svg {border: solid white 1px; background-color: white; display: block; margin: auto; }
 	path.mac, path.win {stroke-width: 0.5px;}
 	#legend {stroke: #ccc; stroke-width: 1px;}
 	.border {stroke: #ccc; stroke-width: 1px; fill: white;}
-	#mapTitle {text-anchor: middle;}
-	rect.bar { fill: rgb(142, 81, 52); }
+	rect.bar { fill: rgb(142, 81, 52); stroke: white; }
+	h1 {text-align: center;}
+	h2 {text-align: center;}
+	p {text-align: center;}
 	</style>
 </head>
 
 <body>
-
+	<h1>Digital Products Price Worldwide</h1>
+  <p>Digital products can be purchased worldwide but their prices across countries differ a lot. <br />
+		Below are the prices for some digital products in 2016.
+	</p>
+	<h2>Most and Least Expensive Mobiles</h2>
 	<svg id="plot1" height="1000" width="1000"></svg>
+	<h2>Laptops?</h2>
 	<svg id="plot2" height="600" width="1000"></svg>
-  	<div id="plot3"></div>
+	<h2>And More... (Just forget about Venezula)</h2>
+	</p>
+  <div id="plot3"></div>
 
 	<script type="text/javascript">
 	// basic variables outside functions
@@ -77,410 +87,473 @@
 
   });
 
-// function for plot1
-function showPhone(){
-	var svg1 = d3.select("#plot1");
-  svg1.append("svg:image")
-			.attr("xlink:href", "ios.png")
-			.attr("x", "100")
-			.attr("y", "50")
-			.attr("width", 300);
-
-	svg1.append("svg:image")
-			.attr("xlink:href", "android.png")
-			.attr("x", "600")
-			.attr("y", "50")
-			.attr("width", 292);
-
-		// find the min and max of ios
-	var data = priceIndex.sort(function(x, y){
-		return d3.ascending(x.iPhone, y.iPhone);})
-
-		var iosMinData = [];
-		var iosMaxData = [];
-
-			// find the minum 7 numbers
-			for (var i = 0; i < 7; i++){
-				iosMinData.push(data[i]);
-			}
-			// find the max 7 numbers
-			for (var i = 0; i < 7; i++){
-				iosMaxData.push(data[data.length-i-1])
-			}
-
-		// find the min and max of android
-		var Androiddata = data.sort(function(x, y){
-		return d3.ascending(x.Android, y.Android);})
-
-		var androidMinData = [];
-		var androidMaxData = [];
-
-			// find the minum 7 numbers
-			for (var i = 0; i < 7; i++){
-				androidMinData.push(Androiddata[i]);
-			}
-			// find the max 7 numbers
-			for (var i = 0; i < 7; i++){
-				androidMaxData.push(Androiddata[data.length-i-1])
-			}
-
-		// draw the most expensive ios price country
-		svg1.append("rect")
-				 .attr("height", 90)
-				 .attr("width", 90)
-				 .attr("rx",10)
-				 .attr("ry",10)
-				 .attr("x",140)
-				 .attr("y",150)
-				 .attr("fill", "#E76818");
-			svg1.append("text")
-					 .attr("x", 185)
-					 .attr("y", 255)
-					 .attr("text-anchor", "middle")
-					 .style("font-size", "10px")
-					 .style("font-family", "Avenir")
-					 .text("Venezuela");
-
-				svg1.append("rect")
-				 .attr("height", 23)
-				 .attr("width", 47)
-				 .attr("rx",8)
-				 .attr("ry",8)
-				 .attr("x",200)
-				 .attr("y",140)
-				 .attr("fill", "#D7191C");
-
-			svg1.append("text")
-					 .attr("x", 223)
-					 .attr("y", 155)
-					 .attr("text-anchor", "middle")
-					 .style("font-size", "12px")
-					 .style("font-family", "Avenir")
-					 .style("fill","white")
-					 .text("$97814");
-
-
-				// draw the most expensive android price country
-				svg1.append("rect")
-				 .attr("height", 90)
-				 .attr("width", 90)
-				 .attr("rx",10)
-				 .attr("ry",10)
-				 .attr("x",640)
-				 .attr("y",140)
-				 .attr("fill", "#E76818");
-			svg1.append("text")
-					 .attr("x", 685)
-					 .attr("y", 245)
-					 .attr("text-anchor", "middle")
-					 .style("font-size", "10px")
-					 .style("font-family", "Avenir")
-					 .text("Venezuela");
-
-		svg1.append("rect")
-				 .attr("height", 23)
-				 .attr("width", 45)
-				 .attr("rx",8)
-				 .attr("ry",8)
-				 .attr("x",700)
-				 .attr("y",130)
-				 .attr("fill", "#D7191C");
-			svg1.append("text")
-					 .attr("x", 723)
-					 .attr("y", 145)
-					 .attr("text-anchor", "middle")
-					 .style("font-size", "12px")
-					 .style("font-family", "Avenir")
-					 .style("fill","white")
-					 .text("$78054");
-
-				var MaxData = Math.max(iosMaxData[1].iPhone, androidMaxData[1].Android)
-				var MinWarmColor = Math.min(iosMaxData[6].iPhone, androidMaxData[6].Android)
-				var MinColdColor = Math.min(iosMinData[0].iPhone, androidMinData[0].Android)
-				var MaxColdColor = Math.max(iosMinData[6].iPhone, androidMinData[6].Android)
-
-			var HeightScale = d3.scaleLinear().domain([200, MaxData]).range([10, 60])
-			var WarmColor = ["#FBE771", "#F8A034"]
-			var WarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
-			var ColdColor = ["#2c7bb6", "#90eb9d"]
-			var ColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
-
-			var androidHeightScale = d3.scaleLinear().domain([200, MaxData]).range([10,60])
-			var androidWarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
-			var androidColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
-
-			//the max values of ios
-
-			for(var i = 1; i < 7; i++){
-				var maxheight = HeightScale(iosMaxData[i].iPhone)
-				var xAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3)
-				var yAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -maxheight
-				var maxCountryName = iosMaxData[i].Country
-				var NamexAxis = xAxis + 30
-				var NameyAxis = yAxis + 15 + maxheight
-				var fillWarmData = WarmColorScale(iosMaxData[i].iPhone)
-
-		svg1.append("rect")
-				 .attr("height",maxheight)
-				 .attr("width",60)
-				 .attr("rx",7)
-				 .attr("ry",7)
-				 .attr("x",xAxis)
-				 .attr("y",yAxis)
-				 .attr("fill",fillWarmData)
-
-			svg1.append("text")
-					.attr("x", NamexAxis)
-					.attr("y", NameyAxis)
-					.attr("text-anchor", "middle")
-					.style("font-size", "10px")
-					.style("font-family", "Avenir")
-					.text(maxCountryName);
-			}
-
-			//the max values of android
-
-			for(var i = 1; i < 7; i++){
-				var androidmaxheight = androidHeightScale(androidMaxData[i].Android)
-				var androidxAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3) + 500
-				var androidyAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -androidmaxheight
-				var androidmaxCountryName = androidMaxData[i].Country
-				var androidNamexAxis = androidxAxis + 30
-				var androidNameyAxis = androidyAxis + 15 + androidmaxheight
-				var androidfillWarmData = androidWarmColorScale(androidMaxData[i].Android)
-
-		svg1.append("rect")
-				 .attr("height",androidmaxheight)
-				 .attr("width",60)
-				 .attr("rx",7)
-				 .attr("ry",7)
-				 .attr("x",androidxAxis)
-				 .attr("y",androidyAxis)
-				 .attr("fill",androidfillWarmData)
-
-			svg1.append("text")
-					.attr("x", androidNamexAxis)
-					.attr("y", androidNameyAxis)
-					.attr("text-anchor", "middle")
-					.style("font-size", "10px")
-					.style("font-family", "Avenir")
-					.text(androidmaxCountryName);
-			}
-
-			//the min values of ios
-			for(var i = 0; i < 7; i++){
-				var minHeight = HeightScale(iosMinData[i].iPhone)
-				var minxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3))
-				var minyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - minHeight
-				var minCountryName = iosMinData[i].Country
-				var minNamexAxis = minxAxis + 30
-				var minNameyAxis = minyAxis + minHeight + 13
-				var fillColdColor = ColdColorScale(iosMinData[i].iPhone)
-
-
-				if (minCountryName == "United Arab Emirates") {minCountryName = "Emirates"}
-
-		svg1.append("rect")
-				 .attr("height",minHeight)
-				 .attr("width",60)
-				 .attr("rx",7)
-				 .attr("ry",7)
-				 .attr("x",minxAxis)
-				 .attr("y",minyAxis)
-				 .attr("fill",fillColdColor)
-
-			svg1.append("text")
-					.attr("x", minNamexAxis)
-					.attr("y", minNameyAxis)
-					.attr("text-anchor", "middle")
-					.style("font-size", "10px")
-					.style("font-family", "Avenir")
-					.text(minCountryName);
-			}
-
-			//the min values of android
-			for(var i = 0; i < 7; i++){
-				var androidminHeight = androidHeightScale(androidMinData[i].Android)
-				var androidminxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3)) + 500
-				var androidminyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - androidminHeight
-				var androidminCountryName = androidMinData[i].Country
-				var androidminNamexAxis = androidminxAxis + 30
-				var androidminNameyAxis = androidminyAxis + androidminHeight + 13
-				var androidfillColdColor = androidColdColorScale(androidMinData[i].Android)
-
-
-				if (androidminCountryName == "United Arab Emirates") {androidminCountryName = "Emirates"}
-
-		svg1.append("rect")
-				 .attr("height",androidminHeight)
-				 .attr("width",60)
-				 .attr("rx",7)
-				 .attr("ry",7)
-				 .attr("x",androidminxAxis)
-				 .attr("y",androidminyAxis)
-				 .attr("fill",androidfillColdColor)
-
-			svg1.append("text")
-					.attr("x", androidminNamexAxis)
-					.attr("y", androidminNameyAxis)
-					.attr("text-anchor", "middle")
-					.style("font-size", "10px")
-					.style("font-family", "Avenir")
-					.text(androidminCountryName);
-			}
-			// add the icons of ios and android
-
-			svg1.append("svg:image")
-					 .attr("xlink:href", "apple.png")
-				 .attr("x", "200")
-				 .attr("y", "650")
-				 .attr("width", 70);
+	// function for plot1
+	function showPhone(){
+		var svg1 = d3.select("#plot1");
+	  svg1.append("svg:image")
+				.attr("xlink:href", "ios.png")
+				.attr("x", "100")
+				.attr("y", "50")
+				.attr("width", 300);
 
 		svg1.append("svg:image")
-				.attr("xlink:href", "androidIcon.png")
-				.attr("x", "720")
-					.attr("y", "650")
-				.attr("width", 70);
-		}
+				.attr("xlink:href", "android.png")
+				.attr("x", "600")
+				.attr("y", "50")
+				.attr("width", 292);
+
+			// find the min and max of ios
+		var data = priceIndex.sort(function(x, y){
+			return d3.ascending(x.iPhone, y.iPhone);})
+
+			var iosMinData = [];
+			var iosMaxData = [];
+
+				// find the minum 7 numbers
+				for (var i = 0; i < 7; i++){
+					iosMinData.push(data[i]);
+				}
+				// find the max 7 numbers
+				for (var i = 0; i < 7; i++){
+					iosMaxData.push(data[data.length-i-1])
+				}
+
+			// find the min and max of android
+			var Androiddata = data.sort(function(x, y){
+			return d3.ascending(x.Android, y.Android);})
+
+			var androidMinData = [];
+			var androidMaxData = [];
+
+				// find the minum 7 numbers
+				for (var i = 0; i < 7; i++){
+					androidMinData.push(Androiddata[i]);
+				}
+				// find the max 7 numbers
+				for (var i = 0; i < 7; i++){
+					androidMaxData.push(Androiddata[data.length-i-1])
+				}
+
+			// draw the most expensive ios price country
+			svg1.append("rect")
+					 .attr("height", 90)
+					 .attr("width", 90)
+					 .attr("rx",10)
+					 .attr("ry",10)
+					 .attr("x",140)
+					 .attr("y",150)
+					 .attr("fill", "#E76818");
+				svg1.append("text")
+						 .attr("x", 185)
+						 .attr("y", 255)
+						 .attr("text-anchor", "middle")
+						 .style("font-size", "10px")
+						 .text("Venezuela");
+
+				svg1.append("rect")
+					 .attr("height", 23)
+					 .attr("width", 47)
+					 .attr("rx",8)
+					 .attr("ry",8)
+					 .attr("x",200)
+					 .attr("y",140)
+					 .attr("fill", "#D7191C");
+
+				svg1.append("text")
+						 .attr("x", 223)
+						 .attr("y", 155)
+						 .attr("text-anchor", "middle")
+						 .style("font-size", "12px")
+						 .style("fill","white")
+						 .text("$97814");
+
+
+					// draw the most expensive android price country
+				svg1.append("rect")
+					 .attr("height", 90)
+					 .attr("width", 90)
+					 .attr("rx",10)
+					 .attr("ry",10)
+					 .attr("x",640)
+					 .attr("y",140)
+					 .attr("fill", "#E76818");
+			svg1.append("text")
+						 .attr("x", 685)
+						 .attr("y", 245)
+						 .attr("text-anchor", "middle")
+						 .style("font-size", "10px")
+						 .text("Venezuela");
+
+			svg1.append("rect")
+					 .attr("height", 23)
+					 .attr("width", 45)
+					 .attr("rx",8)
+					 .attr("ry",8)
+					 .attr("x",700)
+					 .attr("y",130)
+					 .attr("fill", "#D7191C");
+				svg1.append("text")
+						 .attr("x", 723)
+						 .attr("y", 145)
+						 .attr("text-anchor", "middle")
+						 .style("font-size", "12px")
+						 .style("fill","white")
+						 .text("$78054");
+
+					var MaxData = Math.max(iosMaxData[1].iPhone, androidMaxData[1].Android)
+					var MinWarmColor = Math.min(iosMaxData[6].iPhone, androidMaxData[6].Android)
+					var MinColdColor = Math.min(iosMinData[0].iPhone, androidMinData[0].Android)
+					var MaxColdColor = Math.max(iosMinData[6].iPhone, androidMinData[6].Android)
+
+				var HeightScale = d3.scaleLog().domain([400, MaxData]).range([10, 60])
+				var WarmColor = ["#FBE771", "#F8A034"]
+				var WarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
+				// console.log(WarmColorScale(703.94))
+				var ColdColor = ["#2c7bb6", "#90eb9d"]
+				var ColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
+
+				var androidHeightScale = d3.scaleLog().domain([400, MaxData]).range([10,60])
+				var androidWarmColorScale = d3.scaleLinear().domain([MinWarmColor, MaxData]).range(WarmColor);
+				var androidColdColorScale = d3.scaleLinear().domain([MinColdColor, MaxColdColor]).range(ColdColor);
+
+				//the max values of ios
+
+				for(var i = 1; i < 7; i++){
+					var maxheight = HeightScale(iosMaxData[i].iPhone)
+					var xAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3)
+					var yAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -maxheight
+					var maxCountryName = iosMaxData[i].Country
+					var NamexAxis = xAxis + 30
+					var NameyAxis = yAxis + 15 + maxheight
+					var fillWarmData = WarmColorScale(iosMaxData[i].iPhone)
+
+			svg1.append("rect")
+					 .attr("height",maxheight)
+					 .attr("width",60)
+					 .attr("rx",7)
+					 .attr("ry",7)
+					 .attr("x",xAxis)
+					 .attr("y",yAxis)
+					 .attr("fill",fillWarmData)
+
+				svg1.append("text")
+						.attr("x", NamexAxis)
+						.attr("y", NameyAxis)
+						.attr("text-anchor", "middle")
+						.style("font-size", "10px")
+						.text(maxCountryName);
+				}
+
+				//the max values of android
+
+				for(var i = 1; i < 7; i++){
+					var androidmaxheight = androidHeightScale(androidMaxData[i].Android)
+					var androidxAxis = 140 + 60*((i-1)%3)+ 20*((i-1)%3) + 500
+					var androidyAxis = 140 + 90 + 30 + (60+30) * Math.floor((i-1)/3) + 60 -androidmaxheight
+					var androidmaxCountryName = androidMaxData[i].Country
+					var androidNamexAxis = androidxAxis + 30
+					var androidNameyAxis = androidyAxis + 15 + androidmaxheight
+					var androidfillWarmData = androidWarmColorScale(androidMaxData[i].Android)
+
+			svg1.append("rect")
+					 .attr("height",androidmaxheight)
+					 .attr("width",60)
+					 .attr("rx",7)
+					 .attr("ry",7)
+					 .attr("x",androidxAxis)
+					 .attr("y",androidyAxis)
+					 .attr("fill",androidfillWarmData)
+
+				svg1.append("text")
+						.attr("x", androidNamexAxis)
+						.attr("y", androidNameyAxis)
+						.attr("text-anchor", "middle")
+						.style("font-size", "10px")
+						.text(androidmaxCountryName);
+				}
+
+				//the min values of ios
+				for(var i = 0; i < 7; i++){
+					var minHeight = HeightScale(iosMinData[i].iPhone)
+					var minxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3))
+					var minyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - minHeight
+					var minCountryName = iosMinData[i].Country
+					var minNamexAxis = minxAxis + 30
+					var minNameyAxis = minyAxis + minHeight + 13
+					var fillColdColor = ColdColorScale(iosMinData[i].iPhone)
+
+
+					if (minCountryName == "United Arab Emirates") {minCountryName = "Emirates"}
+
+			svg1.append("rect")
+					 .attr("height",minHeight)
+					 .attr("width",60)
+					 .attr("rx",7)
+					 .attr("ry",7)
+					 .attr("x",minxAxis)
+					 .attr("y",minyAxis)
+					 .attr("fill",fillColdColor)
+
+				svg1.append("text")
+						.attr("x", minNamexAxis)
+						.attr("y", minNameyAxis)
+						.attr("text-anchor", "middle")
+						.style("font-size", "10px")
+						.text(minCountryName);
+				}
+
+				//the min values of android
+				for(var i = 0; i < 7; i++){
+					var androidminHeight = androidHeightScale(androidMinData[i].Android)
+					var androidminxAxis = 140 + 20*(Math.max(0,(i-1)%3)) + 60*(Math.max(0,(i-1)%3)) + 500
+					var androidminyAxis = 530 - (30+13)*Math.floor(((i-1)/3)+1) + 20 - androidminHeight
+					var androidminCountryName = androidMinData[i].Country
+					var androidminNamexAxis = androidminxAxis + 30
+					var androidminNameyAxis = androidminyAxis + androidminHeight + 13
+					var androidfillColdColor = androidColdColorScale(androidMinData[i].Android)
+
+
+					if (androidminCountryName == "United Arab Emirates") {androidminCountryName = "Emirates"}
+
+			svg1.append("rect")
+					 .attr("height",androidminHeight)
+					 .attr("width",60)
+					 .attr("rx",7)
+					 .attr("ry",7)
+					 .attr("x",androidminxAxis)
+					 .attr("y",androidminyAxis)
+					 .attr("fill",androidfillColdColor)
+
+				svg1.append("text")
+						.attr("x", androidminNamexAxis)
+						.attr("y", androidminNameyAxis)
+						.attr("text-anchor", "middle")
+						.style("font-size", "10px")
+						.text(androidminCountryName);
+				}
+				// add the icons of ios and android
+
+				svg1.append("svg:image")
+						 .attr("xlink:href", "apple.png")
+					 .attr("x", "200")
+					 .attr("y", "650")
+					 .attr("width", 70);
+
+			svg1.append("svg:image")
+					.attr("xlink:href", "androidIcon.png")
+					.attr("x", "720")
+						.attr("y", "650")
+					.attr("width", 70);
+
+			    	// create legend for the data
+
+	    	var legendDefs = svg1.append('defs');
+	    	var linearGradient1 = legendDefs.append("linearGradient")
+	    	.attr("id", "linearGradient1");
+
+	   		linearGradient1.selectAll("stop")
+	    	.data([
+	        	{offset: "0%", color: "#2c7bb6"},
+	        	{offset: "12.5%", color: "#00a6ca"},
+	        	{offset: "25%", color: "#00ccbc"},
+	        	{offset: "37.5%", color: "#90eb9d"},
+	        	{offset: "50%", color: "#ffff8c"},
+	        	{offset: "62.5%", color: "#f9d057"},
+	        	{offset: "75%", color: "#f29e2e"},
+	       		{offset: "100%", color: "#e76818"},
+	        	// {offset: "100%", color: "#d7191c"}
+	      	])
+	    	.enter().append("stop")
+	    	.attr("offset", function(d) { return d.offset; })
+	    	.attr("stop-color", function(d) { return d.color; });
+
+	    	svg1.append("svg:image")
+	    	.attr("xlink:href", "USiphone.png")
+	   	 	.attr("x", "40%")
+	    	.attr("y", "69%")
+	    	.attr("width", 110);
+
+	    	svg1.append("svg:image")
+	    	.attr("xlink:href", "USandroid.png")
+	   	 	.attr("x", "50%")
+	    	.attr("y", "82%")
+	    	.attr("width", 80);
+
+	    	var legend = svg1.select("#legend");
+	    	svg1.append("rect")
+	   		.attr("id", "legend")
+	   	 	.attr("x", "20%")
+	    	.attr("y", "80%")
+	    	.attr("width", svg1.attr("width")*0.6)
+	    	.attr("height", 20)
+	    	.style("fill", "url(#linearGradient1)");
+
+
+	    	svg1.append("text")
+	    	.attr("id", "svg1")
+	    	.attr("x", "20%")
+	    	.attr("y", "85%")
+	    	.text("Cheapest price")
+	    	.attr("text-anchor", "middle");
+
+	    	svg1.append("text")
+	    	.attr("id", "svg1")
+	    	.attr("x", "80%")
+	    	.attr("y", "85%")
+	    	.text("Most expensive price ")
+	    	.attr("text-anchor", "middle");
+
+
+			}
+
 
 		//function for plot2
-	function showMap(){
+		function showMap(){
+			svg_map = d3.select("#plot2");
+			var projection = d3.geoRobinson();
+			var pathGenerator = d3.geoPath().projection(projection);
 
-		var svg_map = d3.select("#plot2");
-		var projection = d3.geoRobinson();
-		var pathGenerator = d3.geoPath().projection(projection);
+	    // Create Borders
+	    svg_map.append("rect")
+	    .attr("class", "border")
+	    .attr("x", "0")
+	    .attr("y", "0")
+	    .attr("width", svg_map.attr("width")*0.5)
+	    .attr("height", svg_map.attr("height")*0.7);
+	    svg_map.append("rect")
+	    .attr("class", "border")
+	    .attr("x", "51%")
+	    .attr("y", "0")
+	    .attr("width", svg_map.attr("width")*0.49)
+	    .attr("height", svg_map.attr("height")*0.7);
+	    // Show the map for MacBooks
+	    var macExtent = d3.extent(priceIndex2, function(d) {return d.MacBook;});
+	    var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
+	    var minPrice = Math.min(macExtent[0], winExtent[0]);
+	    var maxPrice = Math.max(macExtent[1], winExtent[1]);
+	    var mapColors = ["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818"];
+	    var colorScale = d3.scaleQuantile().domain([Math.log(minPrice), Math.log(maxPrice)]).range(mapColors);
+	    var venezuelaColor = '#d7191c';
+	    var noDataColor = "#e8e8e8";
+	    projection.fitExtent([[-50,-100], [svg_map.attr("width")/2, svg_map.attr("height")-50]], worldMap);
+	    var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
+	    paths1.enter().append("path").attr("class", "mac")
+	    .merge(paths1)
+	    .attr("d", function(country){
+	      return pathGenerator(country);})
+	    .attr("fill", function(country) {
+	      var rowData = mappedData.get(country.properties.name);
+	      if(rowData){
+	        return colorScale(Math.log(rowData.MacBook));
+	      }
+	      if(country.id == "VEN"){
+	        return venezuelaColor
+	      }
+	      else{
+	        return noDataColor;
+	      }})
+	      .attr("stroke", function(country){
+	        var rowData = mappedData.get(country.properties.name);
+	        if(rowData){
+	          return "#ccc";}
+	        else{
+	          return "none";
+	        };
+	      });
+	    // Show the map for Windows Books
+	    projection.fitExtent([[svg_map.attr("width")/2-50,-100], [svg_map.attr("width"), svg_map.attr("height")-50]], worldMap);
+	    var paths2 = svg_map.selectAll("path.win").data(worldMap.features);
+	    paths2.enter().append("path").attr("class", "win")
+	    .merge(paths2)
+	    .attr("d", function (country){
+	      return pathGenerator(country);})
+	    .attr("fill", function(country) {
+	      var rowData = mappedData.get(country.properties.name);
+	      if(rowData){
+	        return colorScale(Math.log(rowData["Windows Powered"]));
+	      }
+	      else if(country.id == "VEN"){
+	        return venezuelaColor;
+	      }
+	      else{
+	        return noDataColor;
+	      }})
+	      .attr("stroke", function(country){
+	        var rowData = mappedData.get(country.properties.name);
+	        if(rowData){
+	          return "#ccc";}
+	        else{
+	          return "none";
+	        }
+	    });
+	    // Create legend for the data
 
-    // Create Borders
-    svg_map.append("rect")
-    .attr("class", "border")
-    .attr("x", "0")
-    .attr("y", "0")
-    .attr("width", svg_map.attr("width")*0.5)
-    .attr("height", svg_map.attr("height")*0.7);
+		for(i = 0; i < mapColors.length; i++){
+		svg_map.append("rect")
+		.attr("x", svg_map.attr("width")*(0.15+i*0.07))
+		.attr("y", "78%")
+		.attr("width", svg_map.attr("width")*0.07)
+		.attr("height", svg_map.attr("height")*0.05)
+		.style("fill", mapColors[i])
+		.style("stroke", "#ccc");
+		}
 
-    svg_map.append("rect")
-    .attr("class", "border")
-    .attr("x", "51%")
-    .attr("y", "0")
-    .attr("width", svg_map.attr("width")*0.49)
-    .attr("height", svg_map.attr("height")*0.7);
+		threshold = colorScale.quantiles();
 
-    // Show the map for MacBooks
-    var macExtent = d3.extent(priceIndex2, function(d) {return d.MacBook;});
-    var winExtent = d3.extent(priceIndex2, function(d) {return d["Windows Powered"];});
-    var minPrice = Math.min(macExtent[0], winExtent[0]);
-    var maxPrice = Math.max(macExtent[1], winExtent[1]);
-    var mapColors = ["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818"];
-    var macScale = d3.scaleQuantile().domain([Math.log(minPrice), Math.log(maxPrice)]).range(mapColors);
-    var venezuelaColor = '#d7191c';
-    var noDataColor = "#e8e8e8";
-    projection.fitExtent([[-50,-100], [svg_map.attr("width")/2, svg_map.attr("height")-50]], worldMap);
-    var paths1 = svg_map.selectAll("path.mac").data(worldMap.features);
-    paths1.enter().append("path").attr("class", "mac")
-    .merge(paths1)
-    .attr("d", function(country){
-      return pathGenerator(country);})
-    .attr("fill", function(country) {
-      var rowData = mappedData.get(country.properties.name);
-      if(rowData){
-        return macScale(Math.log(rowData.MacBook));
-      }
-      if(country.id == "VEN"){
-        return venezuelaColor
-      }
-      else{
-        return noDataColor;
-      }})
-      .attr("stroke", function(country){
-        var rowData = mappedData.get(country.properties.name);
-        if(rowData){
-          return "#ccc";}
-        else{
-          return "none";
-        };
-      });
+		for(i = 0; i < threshold.length; i++){
+		    svg_map.append("text")
+			.attr("x", svg_map.attr("width")*(0.22+i*0.07))
+			.attr("y", "86%")
+			.style("text-anchor", "middle")
+			.text("$"+d3.format(".0f")(Math.exp(threshold[i])));
+		}
+		svg_map.append("text")
+		.attr("x", svg_map.attr("width")*(0.22+7*0.07))
+		.attr("y", "86%")
+		.style("text-anchor", "middle")
+		.text("$"+d3.format(".0f")(maxPrice));
 
-    // Show the map for Windows Books
+		svg_map.append("rect")
+		.attr("x", svg_map.attr("width")*(0.8))
+		.attr("y", "78%")
+		.attr("width", svg_map.attr("width")*0.06)
+		.attr("height", svg_map.attr("height")*0.05)
+		.style("fill", venezuelaColor)
+		.style("stroke", "#ccc");
 
-    projection.fitExtent([[svg_map.attr("width")/2-50,-100], [svg_map.attr("width"), svg_map.attr("height")-50]], worldMap);
-    var paths2 = svg_map.selectAll("path.win").data(worldMap.features);
-    paths2.enter().append("path").attr("class", "win")
-    .merge(paths2)
-    .attr("d", function (country){
-      return pathGenerator(country);})
-    .attr("fill", function(country) {
-      var rowData = mappedData.get(country.properties.name);
-      if(rowData){
-        return macScale(Math.log(rowData["Windows Powered"]));
-      }
-      else if(country.id == "VEN"){
-        return venezuelaColor;
-      }
-      else{
-        return noDataColor;
-      }})
-      .attr("stroke", function(country){
-        var rowData = mappedData.get(country.properties.name);
-        if(rowData){
-          return "#ccc";}
-        else{
-          return "none";
-        }
-    });
+		svg_map.append("text")
+		.attr("x", svg_map.attr("width")*(0.15))
+		.attr("y", "86%")
+		.style("text-anchor", "middle")
+		.text("$0");
 
-    // Create legend for the data
-    var legendDefs = svg_map.append('defs');
-    var linearGradient = legendDefs.append("linearGradient")
-    .attr("id", "linearGradient");
+		svg_map.append("text")
+		.attr("x", svg_map.attr("width")*(0.83))
+		.attr("y", "86%")
+		.style("text-anchor", "middle")
+		.text("$30000+");
 
-    linearGradient.selectAll("stop")
-    .data([
-        {offset: "0%", color: "#2c7bb6"},
-        {offset: "12.5%", color: "#00a6ca"},
-        {offset: "25%", color: "#00ccbc"},
-        {offset: "37.5%", color: "#90eb9d"},
-        {offset: "50%", color: "#ffff8c"},
-        {offset: "62.5%", color: "#f9d057"},
-        {offset: "75%", color: "#f29e2e"},
-        {offset: "87.5%", color: "#e76818"},
-        {offset: "100%", color: "#d7191c"}
-      ])
-    .enter().append("stop")
-    .attr("offset", function(d) { return d.offset; })
-    .attr("stop-color", function(d) { return d.color; });
+	    // Append Logos
+	    svg_map.append("svg:image")
+	    .attr("xlink:href", "Apple_logo.png")
+	    .attr("x", "23%")
+	    .attr("y", "5%")
+	    .attr("width", 30);
+	    svg_map.append("svg:image")
+	    .attr("xlink:href", "Windows_logo.png")
+	    .attr("x", "73%")
+	    .attr("y", "6%")
+	    .attr("width", 30);
+	    // Append title
+	    svg_map.append("text")
+	    .attr("id", "mapTitle")
+	    .attr("x", "17%")
+	    .attr("y", "77%")
+			.style("text-anchor", "middle")
+	    .text("Price");
+	  }
 
-    var legend = svg_map.select("#legend");
-    svg_map.append("rect")
-    .attr("id", "legend")
-    .attr("x", "30%")
-    .attr("y", "80%")
-    .attr("width", svg_map.attr("width")*0.4)
-    .attr("height", 20)
-    .style("fill", "url(#linearGradient)");
-
-
-    // Append Logos
-    svg_map.append("svg:image")
-    .attr("xlink:href", "Apple_logo.png")
-    .attr("x", "23%")
-    .attr("y", "5%")
-    .attr("width", 30);
-
-    svg_map.append("svg:image")
-    .attr("xlink:href", "Windows_logo.png")
-    .attr("x", "73%")
-    .attr("y", "6%")
-    .attr("width", 30);
-
-    // Append title
-    svg_map.append("text")
-    .attr("id", "mapTitle")
-    .attr("x", "50%")
-    .attr("y", "90%")
-    .text("Worldwide Laptop Price");
-  }
-
-  // Some countries (USA, UK, Hong Kong, Uruaguay, Singapore)
+  // Some countries (USA, UK, Uruaguay)
   // have different names in csv & geojson, function to match them
   function cleanMapData(){
     worldMap.features.forEach(function(d){
@@ -521,7 +594,7 @@ function showPhone(){
 				 return bin.length;
 			 }) ])
 		.range([height3 - 10, 10]);
-		
+
 
 		bins.forEach(function (bin) {
 			svg.append("rect").attr("class", "bar")
@@ -529,13 +602,12 @@ function showPhone(){
 			.attr("y", yScale(bin.length))
 			.attr("width", xBands.bandwidth())
 			.attr("height", yScale(0) - yScale(bin.length));
-			
+
 		});
 
 		svg.append("text").attr("class","label")
 			.attr("x","10%").attr("y","90%").text(names[i])
 			.style("font-size", "12px")
-			.style("font-family", "Avenir")
 			.style("fill", "rgb(97, 51, 29)");
 
 		if (i == 5){
@@ -548,9 +620,8 @@ function showPhone(){
 				svg_5.append("text").attr("class", "label")
 				.attr("x", xBands(bin.x0) - xBands.bandwidth() / 2)
 				.attr("y", "80%")
-				.text(bin.x0)
+				.text("$"+bin.x0)
 				.style("font-size", "12px")
-				.style("font-family", "Avenir")
 				.style("fill", "black");
 				}
 
