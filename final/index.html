@@ -6,11 +6,12 @@
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
 	<style>
-	svg { border: solid #ccc 1px; }
+	svg { border: solid white 1px; }
 	path.mac, path.win {stroke-width: 0.5px;}
 	#legend {stroke: #ccc; stroke-width: 1px;}
 	.border {stroke: #ccc; stroke-width: 1px; fill: white;}
 	#mapTitle {text-anchor: middle;}
+	rect.bar { fill: rgb(142, 81, 52); }
 	</style>
 </head>
 
@@ -18,7 +19,7 @@
 
 	<svg id="plot1" height="1000" width="1000"></svg>
 	<svg id="plot2" height="600" width="1000"></svg>
-  <svg id="plot3" height="1000" width="800"></svg>
+  	<div id="plot3"></div>
 
 	<script type="text/javascript">
 	// basic variables outside functions
@@ -26,6 +27,14 @@
 	var priceIndex; //price with Venezula
 	var priceIndex2; //price without Venezula
 	var mappedData;
+	var iPhone3;
+	var android3;
+	var MacBook3;
+	var windowsPowered3;
+	var ps43;
+	var xBox3;
+	var array1 = [iPhone3, android3, MacBook3, windowsPowered3, ps43, xBox3];
+	var names = ["iPhone", "Android", "MacBook", "Windows Powered", "PS4","Xbox one"];
 
 	// function to parse the rows, convert string to number
 	var parseRow = function(row) {
@@ -60,6 +69,12 @@
 		showPhone();
     cleanMapData();
     showMap();
+
+    for (i = 0; i<6; i++){
+    	array1[i] = priceIndex2.map(function(d) {return d[names[i]];});
+    	histogram(priceCounter(array1[i]),i);
+    }
+
   });
 
 // function for plot1
@@ -479,6 +494,80 @@ function showPhone(){
         d.properties.name = "Uruaguay";
       }});
   }
+
+
+	var priceCounter = d3.histogram()
+		.thresholds(25)
+		.domain([0,3500]);
+
+	var height3 = 100;
+	var width3 = 1000;
+	var padding3 = 100;
+
+	function histogram(bins, i) {
+		var svg = d3.select("#plot3").append("svg")
+		.attr("height", height3).attr("width", width3)
+		.attr("id",i);
+
+		var xBands = d3.scaleBand()
+		.domain(bins.map(function (bin) {
+			 return bin.x0;
+		 }))
+		.range([100+padding3, width3-padding3]);
+
+		var yScale = d3.scaleLinear()
+		.domain([0,
+			d3.max(bins, function (bin) {
+				 return bin.length;
+			 }) ])
+		.range([height3 - 10, 10]);
+		
+
+		bins.forEach(function (bin) {
+			svg.append("rect").attr("class", "bar")
+			.attr("x", xBands(bin.x0))
+			.attr("y", yScale(bin.length))
+			.attr("width", xBands.bandwidth())
+			.attr("height", yScale(0) - yScale(bin.length));
+			
+		});
+
+		svg.append("text").attr("class","label")
+			.attr("x","10%").attr("y","90%").text(names[i])
+			.style("font-size", "12px")
+			.style("font-family", "Avenir")
+			.style("fill", "rgb(97, 51, 29)");
+
+		if (i == 5){
+			var svg_5 = d3.select("#plot3").append("svg")
+				.attr("height", 50).attr("width", width3)
+				.attr("id", "xAxis3");
+
+			bins.forEach(function (bin){
+				if (bin.x0%500 == 0){
+				svg_5.append("text").attr("class", "label")
+				.attr("x", xBands(bin.x0) - xBands.bandwidth() / 2)
+				.attr("y", "80%")
+				.text(bin.x0)
+				.style("font-size", "12px")
+				.style("font-family", "Avenir")
+				.style("fill", "black");
+				}
+
+
+			});
+				svg_5.append("line").attr("class", "label")
+				.attr("x1", 200)
+				.attr("y1", "35%")
+				.attr("x2", 900)
+				.attr("y2", "35%")
+				.attr("stroke-width", 2)
+				.attr("stroke", "rgb(97, 51, 29)");
+;
+
+
+		}
+	}
 
 
 </script>
