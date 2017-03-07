@@ -83,6 +83,7 @@
     cleanMapData();
     showMap();
 
+    // call the function for plot3 6 times and draw 6 histograms
     for (i = 0; i<6; i++){
     	array1[i] = priceIndex2.map(function(d) {return d[names[i]];});
     	histogram(priceCounter(array1[i]),i);
@@ -589,6 +590,7 @@
   }
 
 
+  	//code for Histograms
 	var priceCounter = d3.histogram()
 		.thresholds(25)
 		.domain([0,3500]);
@@ -596,7 +598,8 @@
 	var height3 = 100;
 	var width3 = 1000;
 	var padding3 = 100;
-
+	
+	//function to plot a histogram
 	function histogram(bins, i) {
 		var svg = d3.select("#plot3").append("svg")
 		.attr("height", height3).attr("width", width3)
@@ -615,7 +618,7 @@
 			 }) ])
 		.range([height3 - 10, 10]);
 
-
+		//plot bins rectangles
 		bins.forEach(function (bin) {
 			svg.append("rect").attr("class", "bar")
 			.attr("x", xBands(bin.x0))
@@ -624,11 +627,13 @@
 			.attr("height", yScale(0) - yScale(bin.length));
 		});
 
+		//append names (lables on the left)
 		svg.append("text").attr("class","label")
 			.attr("x","10%").attr("y","90%").text(names[i])
 			.style("font-size", "12px")
 			.style("fill", "rgb(97, 51, 29)");
 
+		//if it is the last plot, add a x-axis
 		if (i == 5){
 			var svg_5 = d3.select("#plot3").append("svg")
 				.attr("height", 50).attr("width", width3)
